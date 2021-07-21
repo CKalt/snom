@@ -78,4 +78,33 @@ pub mod parsers {
         let chars = " \t\r\n";
         take_while(move |ch| chars.contains(ch))(input)
     }
+
+    #[cfg(test)]
+    mod tests {
+            use super::*;
+
+            #[test]
+            fn test_parse_term_node() {
+                assert_eq!(
+                    format!("{:?}", parse_term_node("X")), 
+                            r#"Ok(("", Term("X")))"#);
+            }
+
+            #[test]
+            fn test_parse_sexpr() {
+                assert_eq!(
+                    format!("{:?}", parse_sexpr("(ADD X Y)")), 
+                            r#"Ok(("", Func("ADD", [Term("X"), Term("Y")])))"#);
+                assert_eq!(
+                    format!("{:?}", parse_sexpr("( ADD  X    Y )"
+                            )), 
+                            r#"Ok(("", Func("ADD", [Term("X"), Term("Y")])))"#);
+
+                assert_eq!(
+                    format!("{:?}", parse_sexpr(
+                        "( ADD    X (DIV (IF 3 1 3)  2) ( MULT 1 4 1  )  )"
+                            )), 
+                            r#"Ok(("", Func("ADD", [Term("X"), Func("DIV", [Func("IF", [Term("3"), Term("1"), Term("3")]), Term("2")]), Func("MULT", [Term("1"), Term("4"), Term("1")])])))"#);
+            }
+    }
 }
